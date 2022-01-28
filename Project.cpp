@@ -1,4 +1,4 @@
-﻿#include <string>
+#include <string>
 #include <vector>
 #include <utility>
 #include <chrono>
@@ -43,57 +43,22 @@ S get_sequence(const string& _file_name)
 class storage
 {
 private:
-    vector<string> cont_str;
+    list<string> cont_str;
 public:
     void sort()
     {
-        std::sort(cont_str.begin(), cont_str.end(), std::greater<string>());
+        cont_str.sort();
     }
 
-    void insert_nosort(const string& _str)
+    void insert(const string& _str)
     {
         cont_str.push_back(_str);
     }
     
-    void insert(const string& _str)
-    {
-       if (cont_str.size() == 0)
-        {
-            cont_str.push_back(_str);
-            
-        }
-        else if (cont_str.size() == 1)
-        {
-            vector<string>::const_iterator insertElem = cont_str.begin();
-            if ((*(insertElem)).compare(_str) <= 0) cont_str.push_back(_str);
-            else cont_str.insert(cont_str.begin(), _str);
-            return;
-        }
-        else
-        {
-            vector<string>::const_iterator insertElem = cont_str.begin();
-            if ((*(insertElem)).compare(_str) > 0)
-            {
-                cont_str.insert(cont_str.begin(), _str);
-                return;
-            }
-            vector<string>::const_iterator insertElem1 = cont_str.begin();
-            ++insertElem1;
-            for (; insertElem != cont_str.end() && insertElem1 != cont_str.end(); ++insertElem, ++insertElem1)
-              {
-                if (((*(insertElem)).compare(_str) <= 0) && ((*(insertElem1)).compare(_str) > 0))
-                {
-                    cont_str.insert(insertElem1, _str);
-                    return;
-                }
-              }
-            cont_str.push_back(_str);
-        }
-          
-    }
+    
     void erase(uint64_t _index)
     {
-        vector<string>::const_iterator erasingElem = cont_str.begin();
+        std::list<string>::iterator erasingElem = cont_str.begin();
         if (cont_str.size() >= _index)
         {
             advance(erasingElem, _index);
@@ -102,7 +67,7 @@ public:
      }
     const string& get(uint64_t _index)
     {
-        vector<string>::const_iterator getingElem = cont_str.begin();
+        std::list<string>::iterator getingElem = cont_str.begin();
         if (cont_str.size() >= _index)
         {
             advance(getingElem, _index);
@@ -144,12 +109,11 @@ int main()
         st.sort();
         const string& str = st.get(ritr->first);
         total_time += system_clock::now() - time;
-        i++;
-        cout << i << endl;
-        
+               
         if (ritr->second != str)
         {
-
+            cout << "time: " << duration_cast<milliseconds>(total_time).count()
+                << "ms progress: " << progress << " / " << modify.size() << "\n";
             cout << "test failed" << endl;
             return 1;
         }
