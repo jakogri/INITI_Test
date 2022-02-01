@@ -40,38 +40,46 @@ S get_sequence(const string& _file_name)
     return result;
 }
 
+
+
 class storage
 {
 private:
-    list<string> cont_str;
+   vector<string> cont_str;
+  
+
 public:
     void sort()
     {
-        cont_str.sort();
+        //sortR( cont_str, 0, cont_str.size() - 1);
+        std::sort(cont_str.begin(), cont_str.end());
     }
 
     void insert(const string& _str)
     {
         cont_str.push_back(_str);
     }
-    
-    
+
+    void insert_sorted(const string& _str)
+    {
+      auto pos = upper_bound(cont_str.begin(), cont_str.end(), _str);
+      if (pos == cont_str.end()) cont_str.push_back(_str);
+      else  cont_str.insert(pos + 1, _str);
+    }
+
     void erase(uint64_t _index)
     {
-        std::list<string>::iterator erasingElem = cont_str.begin();
+        
         if (cont_str.size() >= _index)
         {
-            advance(erasingElem, _index);
-            cont_str.erase(erasingElem);
+            cont_str.erase(cont_str.begin() + _index);
         }
-     }
+    }
     const string& get(uint64_t _index)
     {
-        std::list<string>::iterator getingElem = cont_str.begin();
-        if (cont_str.size() >= _index)
+       if (cont_str.size() >= _index)
         {
-            advance(getingElem, _index);
-            return *(getingElem);
+            return (cont_str[_index]);
         }
         else return ("");
     }
@@ -84,13 +92,14 @@ int main()
     read_sequence read = get_sequence<read_sequence>("read.txt");
     int i = 0;
     storage st;
- 
+
 
     for (const string& item : write)
     {
         st.insert(item);
     }
-    
+
+    st.sort();
     uint64_t progress = 0;
     uint64_t percent = modify.size() / 100;
 
@@ -105,11 +114,11 @@ int main()
 
         time = system_clock::now();
         st.erase(mitr->first);
-        st.insert(mitr->second);
-        st.sort();
+        st.insert_sorted(mitr->second);
+        
         const string& str = st.get(ritr->first);
         total_time += system_clock::now() - time;
-               
+
         if (ritr->second != str)
         {
             cout << "time: " << duration_cast<milliseconds>(total_time).count()
@@ -117,15 +126,18 @@ int main()
             cout << "test failed" << endl;
             return 1;
         }
-        
+
         if (++progress % (5 * percent) == 0)
         {
             cout << "time: " << duration_cast<milliseconds>(total_time).count()
                 << "ms progress: " << progress << " / " << modify.size() << "\n";
         }
+        i++;
+        cout << i << endl;
     }
 
 
     return 0;
 }
+
 
