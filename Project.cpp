@@ -90,7 +90,6 @@ int main()
     write_sequence write = get_sequence<write_sequence>("write.txt");
     modify_sequence modify = get_sequence<modify_sequence>("modify.txt");
     read_sequence read = get_sequence<read_sequence>("read.txt");
-    int i = 0;
     storage st;
 
 
@@ -132,8 +131,7 @@ int main()
             cout << "time: " << duration_cast<milliseconds>(total_time).count()
                 << "ms progress: " << progress << " / " << modify.size() << "\n";
         }
-        i++;
-        cout << i << endl;
+        
     }
 
 
