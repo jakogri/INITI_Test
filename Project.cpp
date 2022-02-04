@@ -4,8 +4,9 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
-#include <list>
+#include <set>
 #include <algorithm>
+#include  <iterator>
 
 using namespace std;
 using namespace chrono;
@@ -45,26 +46,14 @@ S get_sequence(const string& _file_name)
 class storage
 {
 private:
-   vector<string> cont_str;
+    multiset<string> cont_str;
   
 
 public:
-    void sort()
-    {
-        //sortR( cont_str, 0, cont_str.size() - 1);
-        std::sort(cont_str.begin(), cont_str.end());
-    }
-
+    
     void insert(const string& _str)
     {
-        cont_str.push_back(_str);
-    }
-
-    void insert_sorted(const string& _str)
-    {
-      auto pos = upper_bound(cont_str.begin(), cont_str.end(), _str);
-      if (pos == cont_str.end()) cont_str.push_back(_str);
-      else  cont_str.insert(pos + 1, _str);
+        cont_str.insert(_str);
     }
 
     void erase(uint64_t _index)
@@ -72,14 +61,16 @@ public:
         
         if (cont_str.size() >= _index)
         {
-            cont_str.erase(cont_str.begin() + _index);
+           cont_str.erase(next(cont_str.begin(), _index));
         }
     }
     const string& get(uint64_t _index)
     {
        if (cont_str.size() >= _index)
         {
-            return (cont_str[_index]);
+           multiset<string>::iterator nh = next(cont_str.begin(), _index);
+           return (*nh);
+           
         }
         else return ("");
     }
@@ -90,6 +81,7 @@ int main()
     write_sequence write = get_sequence<write_sequence>("write.txt");
     modify_sequence modify = get_sequence<modify_sequence>("modify.txt");
     read_sequence read = get_sequence<read_sequence>("read.txt");
+   
     storage st;
 
 
@@ -98,7 +90,7 @@ int main()
         st.insert(item);
     }
 
-    st.sort();
+    
     uint64_t progress = 0;
     uint64_t percent = modify.size() / 100;
 
@@ -107,14 +99,14 @@ int main()
 
     modify_sequence::const_iterator mitr = modify.begin();
     read_sequence::const_iterator ritr = read.begin();
-    i = 0;
+    
     for (; mitr != modify.end() && ritr != read.end(); ++mitr, ++ritr)
     {
 
-        time = system_clock::now();
-        st.erase(mitr->first);
-        st.insert_sorted(mitr->second);
         
+        st.erase(mitr->first);
+        st.insert(mitr->second);
+        time = system_clock::now();
         const string& str = st.get(ritr->first);
         total_time += system_clock::now() - time;
 
@@ -128,14 +120,13 @@ int main()
 
         if (++progress % (5 * percent) == 0)
         {
+           
             cout << "time: " << duration_cast<milliseconds>(total_time).count()
                 << "ms progress: " << progress << " / " << modify.size() << "\n";
         }
-        
+       
     }
 
 
     return 0;
 }
-
-
